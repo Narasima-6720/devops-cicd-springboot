@@ -1,13 +1,11 @@
-##artifact build stage
-FROM maven AS buildstage
-RUN mkdir /opt/mindcircuit13
-WORKDIR /opt/mindcircuit13
-COPY . .
-RUN mvn clean install    ## artifact -- .war
+FROM adoptopenjdk/openjdk11:alpine-jre
 
-### tomcat deploy stage
-FROM tomcat
-WORKDIR webapps
-COPY --from=buildstage /opt/mindcircuit13/target/*.war .
-RUN rm -rf ROOT && mv *.war ROOT.war
-EXPOSE 8080
+# Simply the artifact path
+ARG artifact=target/spring-boot-web.jar
+
+WORKDIR /opt/app
+
+COPY ${artifact} app.jar
+
+# This should not be changed
+ENTRYPOINT ["java","-jar","app.jar"]
